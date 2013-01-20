@@ -3,6 +3,7 @@ import com.google.caliper.{Runner => CaliperRunner}
 
 object Runner {
   def main(args: Array[String]) {
-    CaliperRunner.main(classOf[TemplateBenchmark], args)
+    val caliperArgs = ("-Jmemory=-Xmx1G" :: Nil).toArray
+    CaliperRunner.main(classOf[TemplateBenchmark], caliperArgs)
   }
 }

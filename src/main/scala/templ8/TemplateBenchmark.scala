@@ -6,7 +6,7 @@ import org.apache.velocity.VelocityContext
 import model.Person
 import java.io.StringWriter
 import com.gilt.handlebars.Handlebars
-// import org.fusesource.scalate.TemplateEngine
+import org.fusesource.scalate.TemplateEngine
 
 class TemplateBenchmark extends SimpleBenchmark {
   val person = Person()
@@ -38,15 +38,17 @@ class TemplateBenchmark extends SimpleBenchmark {
     ""
   }
 
-//  val scalate = new TemplateEngine
-//  val ssp = "src/main/resources/letter.ssp"
-//
-//  def timeScalateRendering(reps: Int): String = {
-//    for (i <- 0 to reps) {
-//      val s = scalate.layout(ssp, Map("person" -> person))
-//    }
-//
-//    ""
-//  }
+  val scalate = new TemplateEngine
+  scalate.allowCaching = true
+  scalate.allowReload = false
+  val ssp = "src/main/resources/letter.ssp"
+
+  def timeScalateRendering(reps: Int): String = {
+    for (i <- 0 to reps) {
+      val s = scalate.layout(ssp, Map("person" -> person))
+    }
+
+    ""
+  }
 
 }
