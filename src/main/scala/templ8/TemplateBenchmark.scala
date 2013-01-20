@@ -85,4 +85,20 @@ class TemplateBenchmark extends SimpleBenchmark {
     }
     dummy
   }
+
+  def timeStringBuffer(reps: Int): String = {
+    var dummy: String = null
+    for (i <- 1 to reps) {
+      val sb = new StringBuffer
+      sb.append("Dear ")
+      sb.append(person.getFirstName)
+      sb.append(",\n\nIt's good that your surname is ")
+      sb.append(person.getLastName)
+      sb.append(". We realise now that your age is ")
+      sb.append(person.getAge)
+      sb.append(".\n\nHappy Birthday.")
+      dummy = sb.toString
+    }
+    dummy
+  }
 }
