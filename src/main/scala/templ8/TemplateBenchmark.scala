@@ -11,44 +11,62 @@ import org.fusesource.scalate.TemplateEngine
 class TemplateBenchmark extends SimpleBenchmark {
   val person = Person()
 
-  Velocity.init
+  println("Initializing Velocity")
+  Velocity.init()
   var context = new VelocityContext
   context.put("person", person)
-  var template = Velocity.getTemplate("src/main/resources/letter.vm");
+  var template = Velocity.getTemplate("src/main/resources/letter.vm")
 
-  def timeVelocityRendering(reps: Int): String = {
-
-    for (i <- 0 to reps) {
-      val sw = new StringWriter
-      template.merge(context, sw)
-      val s = sw.toString
-    }
-
-    return ""
-  }
-
-  val handlebarsTemplate = scala.io.Source.fromFile("src/main/resources/letter.handlebars").mkString
-  val t = Handlebars(handlebarsTemplate)
-
-  def timeHandlebarsRendering(reps: Int): String = {
-    for (i <- 0 to reps) {
-      val s = t(person)
-    }
-
-    ""
-  }
-
+  println("Initializing Scalate")
   val scalate = new TemplateEngine
   scalate.allowCaching = true
   scalate.allowReload = false
   val ssp = "src/main/resources/letter.ssp"
 
-  def timeScalateRendering(reps: Int): String = {
-    for (i <- 0 to reps) {
-      val s = scalate.layout(ssp, Map("person" -> person))
+  println("Initializing Handlebars")
+  val handlebarsTemplate = scala.io.Source.fromFile("src/main/resources/letter.handlebars").mkString
+  val t = Handlebars(handlebarsTemplate)
+
+  println("Initializing StringFormat template")
+  val stringFormatTemplate = scala.io.Source.fromFile("src/main/resources/letter.sf").mkString
+
+
+  def timeVelocityRendering(reps: Int): String = {
+    var dummy: String = null
+
+    for (i <- 1 to reps) {
+      val sw = new StringWriter
+      template.merge(context, sw)
+      dummy = sw.toString
     }
 
-    ""
+    dummy
   }
 
+  def timeHandlebarsRendering(reps: Int): String = {
+    var dummy: String = null
+
+    for (i <- 1 to reps) {
+      dummy = t(person)
+    }
+
+    dummy
+  }
+
+  def timeScalateRendering(reps: Int): String = {
+    var dummy: String = null
+    for (i <- 1 to reps) {
+      dummy = scalate.layout(ssp, Map("person" -> person))
+    }
+
+    dummy
+  }
+
+  def timeStringFormat(reps: Int): String = {
+    var dummy: String = null
+    for (i <- 1 to reps) {
+      dummy = stringFormatTemplate.format(person.getFirstName, person.getLastName, person.getAge)
+    }
+    dummy
+  }
 }
