@@ -18,7 +18,8 @@ object Build extends Build {
         "com.google.caliper" % "caliper" % "0.5-rc1",
       "org.apache.velocity" % "velocity" % "1.7",
         "com.gilt" % "handlebars" % "0.0.3",
-        "org.fusesource.scalate" % "scalate-web_2.9" % "1.6.1"
+        "org.fusesource.scalate" % "scalate-web_2.9" % "1.6.1",
+        "org.freemarker" % "freemarker" % "2.3.19"
     ),
     resolvers += "sonatypeSnapshots" at "http://oss.sonatype.org/content/repositories/snapshots",
 

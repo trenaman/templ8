@@ -4,9 +4,12 @@ import com.google.caliper.SimpleBenchmark
 import org.apache.velocity.app.Velocity
 import org.apache.velocity.VelocityContext
 import model.Person
-import java.io.StringWriter
+import java.io.{File, StringWriter}
 import com.gilt.handlebars.Handlebars
 import org.fusesource.scalate.TemplateEngine
+import freemarker.template.{DefaultObjectWrapper, Configuration}
+import java.util
+import freemarker.ext.beans.BeansWrapper
 
 class TemplateBenchmark extends SimpleBenchmark {
   val person = Person()
@@ -30,6 +33,11 @@ class TemplateBenchmark extends SimpleBenchmark {
   println("Initializing StringFormat template")
   val stringFormatTemplate = scala.io.Source.fromFile("src/main/resources/letter.sf").mkString
 
+  println("Initializing FreeMarker")
+  val freemarkerConfiguration = new Configuration()
+  freemarkerConfiguration.setDirectoryForTemplateLoading(new File("src/main/resources/"))
+  freemarkerConfiguration.setObjectWrapper(new DefaultObjectWrapper)
+  val freemarkerTemplate = freemarkerConfiguration.getTemplate("letter.ftl")
 
   def timeVelocityRendering(reps: Int): String = {
     var dummy: String = null
@@ -98,6 +106,16 @@ class TemplateBenchmark extends SimpleBenchmark {
       sb.append(person.getAge)
       sb.append(".\n\nHappy Birthday.")
       dummy = sb.toString
+    }
+    dummy
+  }
+
+  def timeFreemarker(reps: Int): String = {
+    var dummy: String = null
+    for (i <- 1 to reps) {
+      val sw = new StringWriter
+      freemarkerTemplate.process(person, sw)
+      dummy = sw.toString
     }
     dummy
   }
