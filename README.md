@@ -26,4 +26,4 @@ Use sbt to build and run.
     [info]        StringBuffer       1279 =
     [info]          Freemarker       5344 =
 
-... Note the results above. Velocity seems awesome-fast; Handlebars (v 0.0.3) is much slower (although this is down to known performance issues with 0.0.3); the real surprise is how slow SSPs are. I suspect there might be some misconfiguration / misuse of the API here.
+... Note the results above. Velocity seems awesome-fast; Handlebars (v 0.0.3) is much slower (although this is down to known performance issues with 0.0.3); the real surprise is how slow SSPs are. I suspect there might be some misconfiguration / misuse of the API here. StringBuilder is fasted (kinda expected) and StringBuffer is slightly slower (due to synchronization). Strange that Freemarker is significantly slower than Velocity. Also strange to see how slow '.format' is in Scala.
