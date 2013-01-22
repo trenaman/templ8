@@ -1,5 +1,10 @@
+Templ8
+======
+
 A small project used to micro-benchmark the performance of a number of templating technologies.
------------------------------------------------------------------------------------------------
+
+Goals
+-----
 
 Benchmarked engines so far:
 
@@ -12,6 +17,7 @@ Benchmarked engines so far:
 * Java dumb String concatenation
 
 TODO:
+
 * Scalate SSP
 * Scalate Mustache
 * Scalate SCAML
@@ -19,26 +25,26 @@ TODO:
 
 Use sbt to build and run.
 
-[info]  0% Scenario{vm=java, trial=0, benchmark=VelocityRendering, memory=-Xmx1G} 76046.60 ns; ?=5012.02 ns @ 10 trials
-[info] 14% Scenario{vm=java, trial=0, benchmark=HandlebarsRendering, memory=-Xmx1G} 258686.40 ns; ?=252375.34 ns @ 10 trials
-[info] 29% Scenario{vm=java, trial=0, benchmark=Freemarker, memory=-Xmx1G} 99578.90 ns; ?=9231.84 ns @ 10 trials
-[info] 43% Scenario{vm=java, trial=0, benchmark=StringFormat, memory=-Xmx1G} 117928.66 ns; ?=3424.17 ns @ 10 trials
-[info] 57% Scenario{vm=java, trial=0, benchmark=StringBuffer, memory=-Xmx1G} 46697.30 ns; ?=646.33 ns @ 10 trials
-[info] 71% Scenario{vm=java, trial=0, benchmark=StringBuilder, memory=-Xmx1G} 46286.94 ns; ?=454.09 ns @ 4 trials
-[info] 86% Scenario{vm=java, trial=0, benchmark=DumbStringConcatenation, memory=-Xmx1G} 893985.81 ns; ?=19321.75 ns @ 10 trials
-[info]
-[info]               benchmark    us linear runtime
-[info]       VelocityRendering  76.0 ==
-[info]     HandlebarsRendering 258.7 ========
-[info]              Freemarker  99.6 ===
-[info]            StringFormat 117.9 ===
-[info]            StringBuffer  46.7 =
-[info]           StringBuilder  46.3 =
-[info] DumbStringConcatenation 894.0 ==============================
-[info]
-[info] vm: java
-[info] trial: 0
-[info] memory: -Xmx1G
+    [info]  0% Scenario{vm=java, trial=0, benchmark=VelocityRendering, memory=-Xmx1G} 76046.60 ns; ?=5012.02 ns @ 10 trials
+    [info] 14% Scenario{vm=java, trial=0, benchmark=HandlebarsRendering, memory=-Xmx1G} 258686.40 ns; ?=252375.34 ns @ 10 trials
+    [info] 29% Scenario{vm=java, trial=0, benchmark=Freemarker, memory=-Xmx1G} 99578.90 ns; ?=9231.84 ns @ 10 trials
+    [info] 43% Scenario{vm=java, trial=0, benchmark=StringFormat, memory=-Xmx1G} 117928.66 ns; ?=3424.17 ns @ 10 trials
+    [info] 57% Scenario{vm=java, trial=0, benchmark=StringBuffer, memory=-Xmx1G} 46697.30 ns; ?=646.33 ns @ 10 trials
+    [info] 71% Scenario{vm=java, trial=0, benchmark=StringBuilder, memory=-Xmx1G} 46286.94 ns; ?=454.09 ns @ 4 trials
+    [info] 86% Scenario{vm=java, trial=0, benchmark=DumbStringConcatenation, memory=-Xmx1G} 893985.81 ns; ?=19321.75 ns @ 10 trials
+    [info]
+    [info]               benchmark    us linear runtime
+    [info]       VelocityRendering  76.0 ==
+    [info]     HandlebarsRendering 258.7 ========
+    [info]              Freemarker  99.6 ===
+    [info]            StringFormat 117.9 ===
+    [info]            StringBuffer  46.7 =
+    [info]           StringBuilder  46.3 =
+    [info] DumbStringConcatenation 894.0 ==============================
+    [info]
+    [info] vm: java
+    [info] trial: 0
+    [info] memory: -Xmx1G
 
 Benchmarks
 ----------
