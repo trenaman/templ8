@@ -1,6 +1,0 @@
-
-Dear $person.firstName,
-
-It's good that your surname is $person.lastName. We realise now that your age is $person.age.
-
-Happy Birthday.
