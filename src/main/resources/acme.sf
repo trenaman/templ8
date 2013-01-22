@@ -1,0 +1,13 @@
+<html>
+  <h2>Name: %s</h2>
+  <h2>Surname: %s</h2>
+  <h2>Age: %s</h2>
+  <h2>Position: %s</h2>
+  <h2>Department: %s</h2>
+  <h2>Years In Position: %s</h2>
+  <h2>Salary: %s</h2>
+  <h2>Projects:</h2>
+  <ul>
+    <li><h3>Code: %s, Budget: %s, Keywords: %s</h3></li>
+  </ul>
+</html>
