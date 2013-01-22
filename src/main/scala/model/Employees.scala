@@ -1,0 +1,60 @@
+package model
+
+import reflect.BeanProperty
+
+import java.util.Date
+
+import java.util.{ List => JList, ArrayList => JArrayList }
+
+case class Employee(
+  @BeanProperty val firstName: String,
+  @BeanProperty val lastName: String,
+  @BeanProperty val age: Int,
+  @BeanProperty val job: Job,
+  @BeanProperty val projects: JList[Project]
+)
+
+case class Job(
+  @BeanProperty val position: String,
+  @BeanProperty val department: String,
+  @BeanProperty val yearsInPosition: Int,
+  @BeanProperty val salary: Long
+)
+
+case class Project(
+  @BeanProperty val code: String,
+  @BeanProperty val budget: Long,
+  @BeanProperty val keywords: JList[String]
+)
+
+object Employee {
+  import java.util.Random
+  import java.math.BigInteger
+  import scala.collection.JavaConverters._
+
+  // use always the same seed to reproduce the test data
+  val random = new Random(Option(System.getProperty("TEMPL8_SEED")).getOrElse("123").toLong)
+
+  def randomString(rnd: Random, n: Int = 32): String = new BigInteger(130, rnd).toString(n)
+
+  def randomProject(rnd: Random): Project = Project(
+    code = randomString(rnd, 4),
+    budget = rnd.nextLong(),
+    keywords = (for { i <- 0 to rnd.nextInt(12) } yield { randomString(rnd, 16) }).toList.asJava
+  )
+
+  def randomJob(rnd: Random): Job = Job(
+    position = randomString(rnd),
+    department = randomString(rnd),
+    yearsInPosition = rnd.nextInt(10),
+    salary = Math.abs(rnd.nextLong())
+  )
+
+  def randomEmployee: Employee = Employee(
+    firstName = randomString(random),
+    lastName = randomString(random),
+    age = random.nextInt(100),
+    job = randomJob(random),
+    projects = (for { i <- 0 to random.nextInt(32) } yield { randomProject(random) }).toList.asJava
+  )
+}

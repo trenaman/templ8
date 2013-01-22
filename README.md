@@ -1,29 +1,64 @@
-A small project used to micro-benchmark the performance of a number of templating technologies, including Apache Velocity, handlebars.scala, Scalate's SSPs, Scala's StringFormat, Java's StringBuilder
+Templ8
+======
+
+A small project used to micro-benchmark the performance of a number of templating technologies.
+
+Goals
+-----
+
+Benchmarked engines so far:
+
+* Apache Velocity
+* Freemarker
+* handlebars.scala
+* Scala StringFormat
+* Java StringBuilder
+* Java StringBuffer
+* Java dumb String concatenation
+
+TODO:
+
+* Scalate SSP
+* Scalate Mustache
+* Scalate SCAML
+* Play 2.1 templates
 
 Use sbt to build and run.
 
-    >  run
-    [info] Running templ8.Runner
-    [info] Initializing Velocity
-    [info] Initializing Scalate
-    [info] Initializing Handlebars
-    [info] Initializing StringFormat template
-    [info] Initializing FreeMarker
-    [info]  0% Scenario{vm=java, trial=0, benchmark=VelocityRendering, memory=-Xmx1G} 863.97 ns; ?=79.49 ns @ 10 trials
-    [info] 14% Scenario{vm=java, trial=0, benchmark=HandlebarsRendering, memory=-Xmx1G} 7426.51 ns; ?=957.80 ns @ 10 trials
-    [info] 29% Scenario{vm=java, trial=0, benchmark=ScalateRendering, memory=-Xmx1G} 606102500.00 ns; ?=239131332.58 ns @ 10 trials
-    [info] 43% Scenario{vm=java, trial=0, benchmark=StringFormat, memory=-Xmx1G} 2963.87 ns; ?=24.71 ns @ 3 trials
-    [info] 57% Scenario{vm=java, trial=0, benchmark=StringBuilder, memory=-Xmx1G} 329.49 ns; ?=46.06 ns @ 10 trials
-    [info] 71% Scenario{vm=java, trial=0, benchmark=StringBuffer, memory=-Xmx1G} 330.20 ns; ?=10.48 ns @ 10 trials
-    [info] 86% Scenario{vm=java, trial=0, benchmark=Freemarker, memory=-Xmx1G} 2674.68 ns; ?=12.31 ns @ 3 trials
+    [info]  0% Scenario{vm=java, trial=0, benchmark=VelocityRendering, memory=-Xmx1G} 76046.60 ns; ?=5012.02 ns @ 10 trials
+    [info] 14% Scenario{vm=java, trial=0, benchmark=HandlebarsRendering, memory=-Xmx1G} 258686.40 ns; ?=252375.34 ns @ 10 trials
+    [info] 29% Scenario{vm=java, trial=0, benchmark=Freemarker, memory=-Xmx1G} 99578.90 ns; ?=9231.84 ns @ 10 trials
+    [info] 43% Scenario{vm=java, trial=0, benchmark=StringFormat, memory=-Xmx1G} 117928.66 ns; ?=3424.17 ns @ 10 trials
+    [info] 57% Scenario{vm=java, trial=0, benchmark=StringBuffer, memory=-Xmx1G} 46697.30 ns; ?=646.33 ns @ 10 trials
+    [info] 71% Scenario{vm=java, trial=0, benchmark=StringBuilder, memory=-Xmx1G} 46286.94 ns; ?=454.09 ns @ 4 trials
+    [info] 86% Scenario{vm=java, trial=0, benchmark=DumbStringConcatenation, memory=-Xmx1G} 893985.81 ns; ?=19321.75 ns @ 10 trials
     [info]
-    [info]           benchmark        ns linear runtime
-    [info]   VelocityRendering       864 =
-    [info] HandlebarsRendering      7427 =
-    [info]    ScalateRendering 606102500 ==============================
-    [info]        StringFormat      2964 =
-    [info]       StringBuilder       329 =
-    [info]        StringBuffer       330 =
-    [info]          Freemarker      2675 =
+    [info]               benchmark    us linear runtime
+    [info]       VelocityRendering  76.0 ==
+    [info]     HandlebarsRendering 258.7 ========
+    [info]              Freemarker  99.6 ===
+    [info]            StringFormat 117.9 ===
+    [info]            StringBuffer  46.7 =
+    [info]           StringBuilder  46.3 =
+    [info] DumbStringConcatenation 894.0 ==============================
+    [info]
+    [info] vm: java
+    [info] trial: 0
+    [info] memory: -Xmx1G
 
-... Note the results above. Velocity seems awesome-fast; Handlebars (v 0.0.3-perf) is about 7x slower; the real surprise is how slow SSPs are. I suspect there might be some misconfiguration / misuse of the API here. StringBuilder is fasted (kinda expected) and StringBuffer is slightly slower (due to synchronization). Strange that Freemarker is significantly slower than Velocity. Also strange to see how slow '.format' is in Scala.
+Benchmarks
+----------
+
+The test are written using the Google Caliper microbenchmarking framework [http://code.google.com/p/caliper/]. Each test
+feeds the tested template engine with a random instance of an *Employee* object. Each rendering run gets a different and randomly
+generated instance. Please note that, given the same random seed, the benchmark is perfectly repetable: every run will produce
+always the same set of random instances.
+
+Comments:
+---------
+
+Velocity seems awesome-fast while Handlebars (v0.0.3-perf) is about 4x slower. The performance hit on a StringBuffer is
+negligible while comparing it to a StringBuilder: probably the JVM is smart enough to figure out that the access
+to the StringBuffer is thread safe thus allowing to remove all synchronization (escape analysis).
+
+Freemarker is slightly slower than Velocity while is really disappointing to see how slow '.format' is in Scala.
