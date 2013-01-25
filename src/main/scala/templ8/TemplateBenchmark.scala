@@ -18,9 +18,6 @@ import org.apache.velocity.app.Velocity
 
 import org.fusesource.scalate.{ TemplateEngine => STemplateEngine }
 
-import org.thymeleaf.{ TemplateEngine => TTemplateEngine }
-import org.thymeleaf.context.Context
-
 import scala.collection.JavaConverters._
 
 object AllRandomEmployees {
@@ -66,25 +63,6 @@ class TemplateBenchmark extends SimpleBenchmark {
   freemarkerConfiguration.setDirectoryForTemplateLoading(new File("src/main/resources/"))
   freemarkerConfiguration.setObjectWrapper(new DefaultObjectWrapper)
   val freemarkerTemplate = freemarkerConfiguration.getTemplate("acme.ftl")
-
-  val thymeleaf = new TTemplateEngine
-  val templateResolver = new org.thymeleaf.templateresolver.FileTemplateResolver
-  templateResolver.setTemplateMode("XHTML")
-  templateResolver.setPrefix("./src/main/resources/")
-  templateResolver.setSuffix(".xhtml")
-  thymeleaf.setTemplateResolver(templateResolver)
-
-  // around 17ms! Too slow: removed for now.
-  // def timeThymeleafRendering(reps: Int): String = {
-  //   var dummy: String = ""
-
-  //   for (i <- 1 to reps) {
-  //     val employee = AllRandomEmployees.rndEmployee(i)
-  //     dummy = thymeleaf.process("acme", employee.asIContext)
-  //   }
-
-  //   dummy
-  // }
 
   def timeVelocityRendering(reps: Int): String = {
     var dummy: String = ""

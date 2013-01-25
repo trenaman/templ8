@@ -3,9 +3,6 @@ package model
 import java.util.Date
 import java.util.{ List => JList, ArrayList => JArrayList, Locale }
 
-import org.thymeleaf.context.Context
-import org.thymeleaf.context.IContext
-
 import reflect.BeanProperty
 
 import scala.collection.JavaConverters._
@@ -23,11 +20,6 @@ case class Employee(
     "age" -> age,
     "job" -> job.asMap,
     "projects" -> (projects.asScala map { _.asMap }).asJava
-  )
-
-  val asIContext: IContext = new Context(
-    Locale.US,
-    Map("employee" -> this).asJava
   )
 }
 
