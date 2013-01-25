@@ -10,6 +10,8 @@ Benchmarked engines so far:
 
 * Apache Velocity
 * Freemarker
+* Scalate SSP
+* Scalate Mustache
 * handlebars.scala
 * Scala StringFormat
 * Java StringBuilder
@@ -18,33 +20,29 @@ Benchmarked engines so far:
 
 TODO:
 
-* Scalate SSP
-* Scalate Mustache
 * Scalate SCAML
 * Play 2.1 templates
+* JSP
 
-Use sbt to build and run.
+Usage
+-----
 
-    [info]  0% Scenario{vm=java, trial=0, benchmark=VelocityRendering, memory=-Xmx1G} 76046.60 ns; ?=5012.02 ns @ 10 trials
-    [info] 14% Scenario{vm=java, trial=0, benchmark=HandlebarsRendering, memory=-Xmx1G} 258686.40 ns; ?=252375.34 ns @ 10 trials
-    [info] 29% Scenario{vm=java, trial=0, benchmark=Freemarker, memory=-Xmx1G} 99578.90 ns; ?=9231.84 ns @ 10 trials
-    [info] 43% Scenario{vm=java, trial=0, benchmark=StringFormat, memory=-Xmx1G} 117928.66 ns; ?=3424.17 ns @ 10 trials
-    [info] 57% Scenario{vm=java, trial=0, benchmark=StringBuffer, memory=-Xmx1G} 46697.30 ns; ?=646.33 ns @ 10 trials
-    [info] 71% Scenario{vm=java, trial=0, benchmark=StringBuilder, memory=-Xmx1G} 46286.94 ns; ?=454.09 ns @ 4 trials
-    [info] 86% Scenario{vm=java, trial=0, benchmark=DumbStringConcatenation, memory=-Xmx1G} 893985.81 ns; ?=19321.75 ns @ 10 trials
-    [info]
-    [info]               benchmark    us linear runtime
-    [info]       VelocityRendering  76.0 ==
-    [info]     HandlebarsRendering 258.7 ========
-    [info]              Freemarker  99.6 ===
-    [info]            StringFormat 117.9 ===
-    [info]            StringBuffer  46.7 =
-    [info]           StringBuilder  46.3 =
-    [info] DumbStringConcatenation 894.0 ==============================
-    [info]
-    [info] vm: java
-    [info] trial: 0
-    [info] memory: -Xmx1G
+To run the benchmarks just type:
+
+   sbt run
+
+Actual output on a MacBook Pro (2012):
+
+    [info]                benchmark    us linear runtime
+    [info]        VelocityRendering  88.9 ===
+    [info]      HandlebarsRendering 350.7 ============
+    [info]      ScalateSSPRendering 535.3 ===================
+    [info] ScalateMustacheRendering 664.5 ========================
+    [info]               Freemarker 180.3 ======
+    [info]             StringFormat 131.3 ====
+    [info]             StringBuffer  53.8 =
+    [info]            StringBuilder  50.7 =
+    [info]  DumbStringConcatenation 818.8 ==============================
 
 Benchmarks
 ----------
@@ -61,4 +59,6 @@ Velocity seems awesome-fast while Handlebars (v0.0.3-perf) is about 4x slower. T
 negligible while comparing it to a StringBuilder: probably the JVM is smart enough to figure out that the access
 to the StringBuffer is thread safe thus allowing to remove all synchronization (escape analysis).
 
-Freemarker is slightly slower than Velocity while is really disappointing to see how slow '.format' is in Scala.
+Freemarker is 2x slower than Velocity while is really disappointing to see how slow '.format' is in Scala.
+
+Scalate falls below all other engines (even the humble Handlebars!) while rendering SSP and Mustache
