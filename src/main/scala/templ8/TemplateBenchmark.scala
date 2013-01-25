@@ -10,13 +10,16 @@ import freemarker.template.{DefaultObjectWrapper, Configuration}
 import java.io.{ File, StringWriter }
 import java.util
 
-import model._
 import model.Employee._
+import model._
 
 import org.apache.velocity.VelocityContext
 import org.apache.velocity.app.Velocity
 
-import org.fusesource.scalate.TemplateEngine
+import org.fusesource.scalate.{ TemplateEngine => STemplateEngine }
+
+import org.thymeleaf.{ TemplateEngine => TTemplateEngine }
+import org.thymeleaf.context.Context
 
 import scala.collection.JavaConverters._
 
@@ -30,10 +33,12 @@ class TemplateBenchmark extends SimpleBenchmark {
   Velocity.init()
   var velocityTemplate = Velocity.getTemplate("src/main/resources/acme.vm")
 
-  val scalate = new TemplateEngine
-  scalate.allowCaching = true
+  val scalate = new STemplateEngine
+  scalate.workingDirectory = new File("data/scalate")
+  scalate.allowCaching = true // false will sky rocket runtime
   scalate.allowReload = false
   val ssp = "src/main/resources/acme.ssp"
+  val mustache = "src/main/resources/acme.mustache"
 
   val handlebarsTemplate = scala.io.Source.fromFile("src/main/resources/acme.handlebars").mkString
   val handlebars = Handlebars(handlebarsTemplate)
@@ -62,6 +67,25 @@ class TemplateBenchmark extends SimpleBenchmark {
   freemarkerConfiguration.setObjectWrapper(new DefaultObjectWrapper)
   val freemarkerTemplate = freemarkerConfiguration.getTemplate("acme.ftl")
 
+  val thymeleaf = new TTemplateEngine
+  val templateResolver = new org.thymeleaf.templateresolver.FileTemplateResolver
+  templateResolver.setTemplateMode("XHTML")
+  templateResolver.setPrefix("./src/main/resources/")
+  templateResolver.setSuffix(".xhtml")
+  thymeleaf.setTemplateResolver(templateResolver)
+
+  // around 17ms! Too slow: removed for now.
+  // def timeThymeleafRendering(reps: Int): String = {
+  //   var dummy: String = ""
+
+  //   for (i <- 1 to reps) {
+  //     val employee = AllRandomEmployees.rndEmployee(i)
+  //     dummy = thymeleaf.process("acme", employee.asIContext)
+  //   }
+
+  //   dummy
+  // }
+
   def timeVelocityRendering(reps: Int): String = {
     var dummy: String = ""
 
@@ -87,16 +111,25 @@ class TemplateBenchmark extends SimpleBenchmark {
     dummy
   }
 
+  def timeScalateSSPRendering(reps: Int): String = {
+    var dummy: String = null
 
-  // commenting out given that is way too slow and is hiding others
-  // def timeScalateSSPRendering(reps: Int): String = {
-  //   var dummy: String = null
+    for (i <- 1 to reps) {
+      dummy = scalate.layout(ssp, Map("employee" -> AllRandomEmployees.rndEmployee(i)))
+    }
 
-  //   for (i <- 1 to reps) {
-  //     dummy = scalate.layout(ssp, Map("employee" -> AllRandomEmployees.rndEmployee(i)))
-  //   }
-  //   dummy
-  // }
+    dummy
+  }
+
+  def timeScalateMustacheRendering(reps: Int): String = {
+    var dummy: String = null
+
+    for (i <- 1 to reps) {
+      dummy = scalate.layout(mustache, AllRandomEmployees.rndEmployee(i).asMap)
+    }
+
+    dummy
+  }
 
   // TODO Scalate Mustache
   // TODO Scalate SCAML

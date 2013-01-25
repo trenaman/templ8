@@ -1,0 +1,15 @@
+<html>
+  <h2>Name: {{firstName}}</h2>
+  <h2>Surname: {{lastName}}</h2>
+  <h2>Age: {{age}}</h2>
+  <h2>Position: {{position}}</h2>
+  <h2>Department: {{department}}</h2>
+  <h2>Years In Position: {{yearsInPosition}}</h2>
+  <h2>Salary: {{salary}}</h2>
+  <h2>Projects:</h2>
+  <ul>
+    {{#projects}}
+    <li><h3>Code: {{code}}, Budget: {{budget}}, Keywords: {{keywords}}</h3></li>
+    {{/projects}}
+  </ul>
+</html>

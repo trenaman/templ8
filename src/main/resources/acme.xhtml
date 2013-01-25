@@ -1,0 +1,20 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-3.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+  <head></head>
+
+  <body>
+    <h2>Name: <b th:text="${employee.firstName}">*</b></h2>
+    <h2>Surname: <b th:text="${employee.lastName}">*</b></h2>
+    <h2>Age: <b th:text="${employee.age}">*</b></h2>
+    <h2>Position: <b th:text="${employee.job.position}">*</b></h2>
+    <h2>Department: <b th:text="${employee.job.department}">*</b></h2>
+    <h2>Years In Position: <b th:text="${employee.job.yearsInPosition}">*</b></h2>
+    <h2>Salary: <b th:text="${employee.job.salary}">*</b></h2>
+    <h2>Projects:</h2>
+    <ul th:each="project: ${employee.projects}">
+      <li><h3>Code: <b th:text="${project.code}">*</b>, Budget: <b th:text="${project.budget}">*</b>, Keywords: <b th:text="${project.keywords}">*</b></h3></li>
+    </ul>
+  </body>
+</html>
