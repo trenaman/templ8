@@ -67,7 +67,7 @@ class TemplateBenchmark extends SimpleBenchmark {
   freemarkerConfiguration.setObjectWrapper(new DefaultObjectWrapper)
   val freemarkerTemplate = freemarkerConfiguration.getTemplate("acme.ftl")
 
-  def timeVelocityRendering(reps: Int): String = {
+  def timeVelocity(reps: Int): String = {
     var dummy: String = ""
 
     for (i <- 1 to reps) {
@@ -82,7 +82,7 @@ class TemplateBenchmark extends SimpleBenchmark {
     dummy
   }
 
-  def timeHandlebarsScalaRendering(reps: Int): String = {
+  def timeHandlebarsScala(reps: Int): String = {
     var dummy: String = null
 
     for (i <- 1 to reps) {
@@ -92,7 +92,7 @@ class TemplateBenchmark extends SimpleBenchmark {
     dummy
   }
 
-  def timePlay20Rendering(reps: Int): String = {
+  def timePlay20(reps: Int): String = {
     var dummy: String = null
 
     for (i <- 1 to reps) {
@@ -103,7 +103,7 @@ class TemplateBenchmark extends SimpleBenchmark {
     dummy
   }
 
-  def timeScalateSSPRendering(reps: Int): String = {
+  def timeScalateSSP(reps: Int): String = {
     var dummy: String = null
 
     for (i <- 1 to reps) {
@@ -113,7 +113,7 @@ class TemplateBenchmark extends SimpleBenchmark {
     dummy
   }
 
-  def timeScalateMustacheRendering(reps: Int): String = {
+  def timeScalateMustache(reps: Int): String = {
     var dummy: String = null
 
     for (i <- 1 to reps) {
