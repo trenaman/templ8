@@ -11,12 +11,15 @@ import java.io.{ File, StringWriter }
 import java.util
 
 import model.Employee._
+
 import model._
 
 import org.apache.velocity.VelocityContext
 import org.apache.velocity.app.Velocity
 
 import org.fusesource.scalate.{ TemplateEngine => STemplateEngine }
+
+import play.templates.ScalaTemplateCompiler
 
 import scala.collection.JavaConverters._
 
@@ -79,13 +82,24 @@ class TemplateBenchmark extends SimpleBenchmark {
     dummy
   }
 
-  def timeHandlebarsRendering(reps: Int): String = {
+  def timeHandlebarsScalaRendering(reps: Int): String = {
     var dummy: String = null
 
     for (i <- 1 to reps) {
       val employee = AllRandomEmployees.rndEmployee(i)
       dummy = handlebars(employee)
     }
+    dummy
+  }
+
+  def timePlay20Rendering(reps: Int): String = {
+    var dummy: String = null
+
+    for (i <- 1 to reps) {
+      val employee = AllRandomEmployees.rndEmployee(i)
+      dummy = acme.render(employee).toString
+    }
+
     dummy
   }
 
@@ -232,5 +246,49 @@ class TemplateBenchmark extends SimpleBenchmark {
     }
 
     dummy
+  }
+}
+
+// Play 2.0 template utils
+// Utils needed to compile a Play template into Scala code. To update after a new version
+// of Play template:
+//
+// 1. Update the Play template prj version in project/Build.scala
+// 2. sbt console
+// 3. templ8.PlayUtils.recompile()
+// 4. mv src/main/resources/html/acme.template.scala src/main/scala/templ8
+// 5. edit acme.template.scala and change its classpath from `html` to `templ8`
+// 6. sbt compile to make sure it works
+// TODO this could be auto but is not worth the 5 mins of work
+import play.templates._
+
+case class Html(text: String) extends Appendable[Html] {
+  val buffer = new StringBuilder(text)
+  def +(other: Html) = {
+    buffer.append(other.buffer)
+    this
+  }
+  override def toString = buffer.toString
+}
+
+object HtmlFormat extends Format[Html] {
+  def raw(text: String) = Html(text)
+  def escape(text: String) = Html(text.replace("<", "&lt;"))
+}
+
+object PlayUtils {
+  val playTemplateCompiler = ScalaTemplateCompiler
+  val playTemplate = new File("src/main/resources/acme.scala.html")
+  val playTemplateFolder = new File("src/main/resources")
+  val playTemplateGeneratedFolder = new File("src/main/resources")
+
+  def recompile(): Option[File] = {
+    playTemplateCompiler.compile(
+      source = playTemplate,
+      sourceDirectory = playTemplateGeneratedFolder,
+      generatedDirectory = playTemplateGeneratedFolder,
+      resultType = "templ8.Html",
+      formatterType = "templ8.HtmlFormat"
+    )
   }
 }

@@ -19,9 +19,13 @@ object Build extends Build {
         "org.apache.velocity" % "velocity" % "1.7",
         "com.gilt" % "handlebars" % "0.0.3-perf",
         "org.fusesource.scalate" % "scalate-web_2.9" % "1.6.1",
-        "org.freemarker" % "freemarker" % "2.3.19"
+        "org.freemarker" % "freemarker" % "2.3.19",
+        "play" % "templates_2.9.1" % "2.0.2"
     ),
-    resolvers += "sonatypeSnapshots" at "http://oss.sonatype.org/content/repositories/snapshots",
+    resolvers ++= Seq(
+      "sonatypeSnapshots" at "http://oss.sonatype.org/content/repositories/snapshots",
+      "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/"
+    ),
 
     // enable forking in run
     fork in run := true,
