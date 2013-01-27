@@ -1,0 +1,17 @@
+@(employee: model.Employee)
+
+<html>
+  <h2>Name: @employee.firstName</h2>
+  <h2>Surname: $@employee.lastName</h2>
+  <h2>Age: @employee.age</h2>
+  <h2>Position: @employee.job.position</h2>
+  <h2>Department: @employee.job.department</h2>
+  <h2>Years In Position: @employee.job.yearsInPosition</h2>
+  <h2>Salary: @employee.job.salary</h2>
+  <h2>Projects:</h2>
+  <ul>
+    @for(project <- employee.projects) {
+    <li><h3>Code: @project.code, Budget: @project.budget, Keywords: @project.keywords</h3></li>
+    }
+  </ul>
+</html>

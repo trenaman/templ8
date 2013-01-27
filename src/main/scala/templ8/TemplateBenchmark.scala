@@ -11,6 +11,7 @@ import java.io.{ File, StringWriter }
 import java.util
 
 import model.Employee._
+
 import model._
 
 import org.apache.velocity.VelocityContext
@@ -18,15 +19,16 @@ import org.apache.velocity.app.Velocity
 
 import org.fusesource.scalate.{ TemplateEngine => STemplateEngine }
 
+import play.templates.ScalaTemplateCompiler
+
 import scala.collection.JavaConverters._
 
 object AllRandomEmployees {
-  private val rndEmployees: List[Employee] = (for { i <- 0 to 10000 } yield { Employee.randomEmployee }).toList
+  private val rndEmployees: Array[Employee] = (for { i <- 0 to 10000 } yield { Employee.randomEmployee }).toArray
   def rndEmployee(i: Int): Employee = rndEmployees(i % rndEmployees.size)
 }
 
-class TemplateBenchmark extends SimpleBenchmark {
-
+object Engines {
   Velocity.init()
   var velocityTemplate = Velocity.getTemplate("src/main/resources/acme.vm")
 
@@ -63,33 +65,12 @@ class TemplateBenchmark extends SimpleBenchmark {
   freemarkerConfiguration.setDirectoryForTemplateLoading(new File("src/main/resources/"))
   freemarkerConfiguration.setObjectWrapper(new DefaultObjectWrapper)
   val freemarkerTemplate = freemarkerConfiguration.getTemplate("acme.ftl")
+}
 
-  def timeVelocityRendering(reps: Int): String = {
-    var dummy: String = ""
+class TemplateBenchmark extends SimpleBenchmark {
+  import Engines._
 
-    for (i <- 1 to reps) {
-      val sw = new StringWriter
-      val employee = AllRandomEmployees.rndEmployee(i)
-      var context = new VelocityContext
-      context.put("employee", employee)
-      velocityTemplate.merge(context, sw)
-      dummy = sw.toString
-    }
-
-    dummy
-  }
-
-  def timeHandlebarsRendering(reps: Int): String = {
-    var dummy: String = null
-
-    for (i <- 1 to reps) {
-      val employee = AllRandomEmployees.rndEmployee(i)
-      dummy = handlebars(employee)
-    }
-    dummy
-  }
-
-  def timeScalateSSPRendering(reps: Int): String = {
+  def timeScalateSSP(reps: Int): String = {
     var dummy: String = null
 
     for (i <- 1 to reps) {
@@ -99,7 +80,7 @@ class TemplateBenchmark extends SimpleBenchmark {
     dummy
   }
 
-  def timeScalateMustacheRendering(reps: Int): String = {
+  def timeScalateMustache(reps: Int): String = {
     var dummy: String = null
 
     for (i <- 1 to reps) {
@@ -109,9 +90,26 @@ class TemplateBenchmark extends SimpleBenchmark {
     dummy
   }
 
-  // TODO Scalate Mustache
-  // TODO Scalate SCAML
-  // TODO Play templates
+  def timeHandlebarsScala(reps: Int): String = {
+    var dummy: String = null
+
+    for (i <- 1 to reps) {
+      val employee = AllRandomEmployees.rndEmployee(i)
+      dummy = handlebars(employee)
+    }
+    dummy
+  }
+
+  def timePlay20(reps: Int): String = {
+    var dummy: String = null
+
+    for (i <- 1 to reps) {
+      val employee = AllRandomEmployees.rndEmployee(i)
+      dummy = acme.render(employee).toString
+    }
+
+    dummy
+  }
 
   def timeFreemarker(reps: Int): String = {
     var dummy: String = null
@@ -120,6 +118,21 @@ class TemplateBenchmark extends SimpleBenchmark {
       val sw = new StringWriter
       val employee = AllRandomEmployees.rndEmployee(i)
       freemarkerTemplate.process(employee, sw)
+      dummy = sw.toString
+    }
+
+    dummy
+  }
+
+  def timeVelocity(reps: Int): String = {
+    var dummy: String = ""
+
+    for (i <- 1 to reps) {
+      val sw = new StringWriter
+      val employee = AllRandomEmployees.rndEmployee(i)
+      var context = new VelocityContext
+      context.put("employee", employee)
+      velocityTemplate.merge(context, sw)
       dummy = sw.toString
     }
 
@@ -232,5 +245,49 @@ class TemplateBenchmark extends SimpleBenchmark {
     }
 
     dummy
+  }
+}
+
+// Play 2.0 template utils
+// Utils needed to compile a Play template into Scala code. To update after a new version
+// of Play template:
+//
+// 1. Update the Play template prj version in project/Build.scala
+// 2. sbt console
+// 3. templ8.PlayUtils.recompile()
+// 4. mv src/main/resources/html/acme.template.scala src/main/scala/templ8
+// 5. edit acme.template.scala and change its classpath from `html` to `templ8`
+// 6. sbt compile to make sure it works
+// TODO this could be auto but is not worth the 5 mins of work
+import play.templates._
+
+case class Html(text: String) extends Appendable[Html] {
+  val buffer = new StringBuilder(text)
+  def +(other: Html) = {
+    buffer.append(other.buffer)
+    this
+  }
+  override def toString = buffer.toString
+}
+
+object HtmlFormat extends Format[Html] {
+  def raw(text: String) = Html(text)
+  def escape(text: String) = Html(text.replace("<", "&lt;"))
+}
+
+object PlayUtils {
+  val playTemplateCompiler = ScalaTemplateCompiler
+  val playTemplate = new File("src/main/resources/acme.scala.html")
+  val playTemplateFolder = new File("src/main/resources")
+  val playTemplateGeneratedFolder = new File("src/main/resources")
+
+  def recompile(): Option[File] = {
+    playTemplateCompiler.compile(
+      source = playTemplate,
+      sourceDirectory = playTemplateGeneratedFolder,
+      generatedDirectory = playTemplateGeneratedFolder,
+      resultType = "templ8.Html",
+      formatterType = "templ8.HtmlFormat"
+    )
   }
 }
