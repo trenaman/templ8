@@ -24,12 +24,11 @@ import play.templates.ScalaTemplateCompiler
 import scala.collection.JavaConverters._
 
 object AllRandomEmployees {
-  private val rndEmployees: List[Employee] = (for { i <- 0 to 10000 } yield { Employee.randomEmployee }).toList
+  private val rndEmployees: Array[Employee] = (for { i <- 0 to 10000 } yield { Employee.randomEmployee }).toArray
   def rndEmployee(i: Int): Employee = rndEmployees(i % rndEmployees.size)
 }
 
-class TemplateBenchmark extends SimpleBenchmark {
-
+object Engines {
   Velocity.init()
   var velocityTemplate = Velocity.getTemplate("src/main/resources/acme.vm")
 
@@ -66,17 +65,26 @@ class TemplateBenchmark extends SimpleBenchmark {
   freemarkerConfiguration.setDirectoryForTemplateLoading(new File("src/main/resources/"))
   freemarkerConfiguration.setObjectWrapper(new DefaultObjectWrapper)
   val freemarkerTemplate = freemarkerConfiguration.getTemplate("acme.ftl")
+}
 
-  def timeVelocity(reps: Int): String = {
-    var dummy: String = ""
+class TemplateBenchmark extends SimpleBenchmark {
+  import Engines._
+
+  def timeScalateSSP(reps: Int): String = {
+    var dummy: String = null
 
     for (i <- 1 to reps) {
-      val sw = new StringWriter
-      val employee = AllRandomEmployees.rndEmployee(i)
-      var context = new VelocityContext
-      context.put("employee", employee)
-      velocityTemplate.merge(context, sw)
-      dummy = sw.toString
+      dummy = scalate.layout(ssp, Map("employee" -> AllRandomEmployees.rndEmployee(i)))
+    }
+
+    dummy
+  }
+
+  def timeScalateMustache(reps: Int): String = {
+    var dummy: String = null
+
+    for (i <- 1 to reps) {
+      dummy = scalate.layout(mustache, AllRandomEmployees.rndEmployee(i).asMap)
     }
 
     dummy
@@ -103,30 +111,6 @@ class TemplateBenchmark extends SimpleBenchmark {
     dummy
   }
 
-  def timeScalateSSP(reps: Int): String = {
-    var dummy: String = null
-
-    for (i <- 1 to reps) {
-      dummy = scalate.layout(ssp, Map("employee" -> AllRandomEmployees.rndEmployee(i)))
-    }
-
-    dummy
-  }
-
-  def timeScalateMustache(reps: Int): String = {
-    var dummy: String = null
-
-    for (i <- 1 to reps) {
-      dummy = scalate.layout(mustache, AllRandomEmployees.rndEmployee(i).asMap)
-    }
-
-    dummy
-  }
-
-  // TODO Scalate Mustache
-  // TODO Scalate SCAML
-  // TODO Play templates
-
   def timeFreemarker(reps: Int): String = {
     var dummy: String = null
 
@@ -134,6 +118,21 @@ class TemplateBenchmark extends SimpleBenchmark {
       val sw = new StringWriter
       val employee = AllRandomEmployees.rndEmployee(i)
       freemarkerTemplate.process(employee, sw)
+      dummy = sw.toString
+    }
+
+    dummy
+  }
+
+  def timeVelocity(reps: Int): String = {
+    var dummy: String = ""
+
+    for (i <- 1 to reps) {
+      val sw = new StringWriter
+      val employee = AllRandomEmployees.rndEmployee(i)
+      var context = new VelocityContext
+      context.put("employee", employee)
+      velocityTemplate.merge(context, sw)
       dummy = sw.toString
     }
 

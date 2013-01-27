@@ -10,6 +10,7 @@ object Build extends Build {
     organization := "org.adehaus",
     version := "1.0.0-SNAPSHOT",
     scalaVersion := "2.9.2",
+    scalacOptions += "-deprecation",
 
     // dependencies
     libraryDependencies ++= Seq(

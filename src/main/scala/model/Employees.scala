@@ -69,7 +69,7 @@ object Employee {
     position = randomString(rnd),
     department = randomString(rnd),
     yearsInPosition = rnd.nextInt(10),
-    salary = Math.abs(rnd.nextLong())
+    salary = rnd.nextLong().abs
   )
 
   def randomEmployee: Employee = Employee(
