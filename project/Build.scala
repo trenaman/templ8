@@ -18,7 +18,7 @@ object Build extends Build {
         "com.google.code.gson" % "gson" % "1.7.1",
         "com.google.caliper" % "caliper" % "0.5-rc1",
         "org.apache.velocity" % "velocity" % "1.7",
-        "com.gilt" % "handlebars" % "0.0.3-perf",
+        "com.gilt" % "handlebars" % "0.0.4",
         "org.fusesource.scalate" % "scalate-web_2.9" % "1.6.1",
         "org.freemarker" % "freemarker" % "2.3.19",
         "play" % "templates_2.9.1" % "2.0.2"
