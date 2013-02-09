@@ -26,19 +26,19 @@ To run the benchmarks just type:
 
    sbt run
 
-Actual output on a MacBook Pro (2012):
+Actual output on a MacBook Air (2012):
 
-       [info]               benchmark    us linear runtime
-       [info]              ScalateSSP 441.7 ===============
-       [info]         ScalateMustache 599.6 ====================
-       [info]         HandlebarsScala 284.6 =========
-       [info]                  Play20 262.1 =========
-       [info]              Freemarker 107.5 ===
-       [info]                Velocity  59.1 ==
-       [info]            StringFormat 105.9 ===
-       [info]            StringBuffer  21.1 =
-       [info]           StringBuilder  20.9 =
-       [info] DumbStringConcatenation 864.9 ==============================
+[info]               benchmark     us linear runtime
+[info]              ScalateSSP  728.6 ========
+[info]         ScalateMustache 1430.6 ================
+[info]         HandlebarsScala  477.8 =====
+[info]                  Play20 2638.6 ==============================
+[info]              Freemarker  124.6 =
+[info]                Velocity   77.5 =
+[info]            StringFormat  162.3 =
+[info]            StringBuffer   26.2 =
+[info]           StringBuilder   28.0 =
+[info] DumbStringConcatenation  934.4 ==========
 
 Benchmarks
 ----------
@@ -53,11 +53,12 @@ TODO: Would be nice to perform the same tests but factoring in concurrency to ch
 Comments
 ---------
 
-Velocity seems awesome-fast while Handlebars (v0.0.3-perf) is about 4x slower. The performance hit on a StringBuffer is
+Velocity seems awesome-fast. The performance hit on a StringBuffer is
 negligible while comparing it to a StringBuilder: probably the JVM is smart enough to figure out that the access
 to the StringBuffer is thread safe thus allowing to remove all synchronization (escape analysis).
 
-Freemarker is 2x slower than Velocity while is really disappointing to see how slow '.format' is in Scala. Play 2.0
-templates are faster then all the Scalate dialects and is at par with Handlebars.scala (!).
+Freemarker is 2x slower than Velocity while is really disappointing to see how slow '.format' is in Scala.
 
 Scalate falls below all other engines (even the humble Handlebars!) while rendering SSP and Mustache
+
+It's strange to see Play20 templating be so slow; suspect that there is something not right in our Play benchmark.

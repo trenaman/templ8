@@ -37,7 +37,9 @@ object Engines {
   scalate.allowCaching = true // false will sky rocket runtime
   scalate.allowReload = false
   val ssp = "src/main/resources/acme.ssp"
+  val warmUpSsp = scalate.layout(ssp, Map("employee" -> AllRandomEmployees.rndEmployee(0)))
   val mustache = "src/main/resources/acme.mustache"
+  val warmUpMustache = scalate.layout(mustache, AllRandomEmployees.rndEmployee(0).asMap)
 
   val handlebarsTemplate = scala.io.Source.fromFile("src/main/resources/acme.handlebars").mkString
   val handlebars = Handlebars(handlebarsTemplate)
@@ -72,9 +74,10 @@ class TemplateBenchmark extends SimpleBenchmark {
 
   def timeScalateSSP(reps: Int): String = {
     var dummy: String = null
-
-    for (i <- 1 to reps) {
+    var i = 0
+    while (i < reps) {
       dummy = scalate.layout(ssp, Map("employee" -> AllRandomEmployees.rndEmployee(i)))
+      i += 1
     }
 
     dummy
@@ -83,8 +86,10 @@ class TemplateBenchmark extends SimpleBenchmark {
   def timeScalateMustache(reps: Int): String = {
     var dummy: String = null
 
-    for (i <- 1 to reps) {
+    var i = 0
+    while (i < reps) {
       dummy = scalate.layout(mustache, AllRandomEmployees.rndEmployee(i).asMap)
+      i += 1
     }
 
     dummy
@@ -93,19 +98,22 @@ class TemplateBenchmark extends SimpleBenchmark {
   def timeHandlebarsScala(reps: Int): String = {
     var dummy: String = null
 
-    for (i <- 1 to reps) {
+    var i = 0
+    while (i < reps) {
       val employee = AllRandomEmployees.rndEmployee(i)
       dummy = handlebars(employee)
+      i += 1
     }
     dummy
   }
 
   def timePlay20(reps: Int): String = {
     var dummy: String = null
-
-    for (i <- 1 to reps) {
+    var i = 0
+    while (i < reps) {
       val employee = AllRandomEmployees.rndEmployee(i)
       dummy = acme.render(employee).toString
+      i += 1
     }
 
     dummy
@@ -114,11 +122,13 @@ class TemplateBenchmark extends SimpleBenchmark {
   def timeFreemarker(reps: Int): String = {
     var dummy: String = null
 
-    for (i <- 1 to reps) {
+    var i = 0
+    while (i < reps) {
       val sw = new StringWriter
       val employee = AllRandomEmployees.rndEmployee(i)
       freemarkerTemplate.process(employee, sw)
       dummy = sw.toString
+      i += 1
     }
 
     dummy
@@ -127,13 +137,16 @@ class TemplateBenchmark extends SimpleBenchmark {
   def timeVelocity(reps: Int): String = {
     var dummy: String = ""
 
-    for (i <- 1 to reps) {
+    var i = 0
+    while (i < reps) {
       val sw = new StringWriter
       val employee = AllRandomEmployees.rndEmployee(i)
       var context = new VelocityContext
       context.put("employee", employee)
       velocityTemplate.merge(context, sw)
       dummy = sw.toString
+
+      i += 1
     }
 
     dummy
@@ -141,7 +154,8 @@ class TemplateBenchmark extends SimpleBenchmark {
 
   def timeStringFormat(reps: Int): String = {
     var dummy: String = null
-    for (i <- 1 to reps) {
+    var i = 0
+    while (i < reps) {
       val employee = AllRandomEmployees.rndEmployee(i)
       dummy = MainStringFormatTemplate.format(
         employee.firstName,
@@ -155,6 +169,7 @@ class TemplateBenchmark extends SimpleBenchmark {
            (employee.projects.asScala map { p => ProjectsStringFormatTemplate.format(p.code, p.budget, p.keywords) }).mkString("\n")
         }
       )
+      i += 1
     }
 
     dummy
@@ -163,7 +178,8 @@ class TemplateBenchmark extends SimpleBenchmark {
   def timeStringBuffer(reps: Int): String = {
     var dummy: String = null
 
-    for (i <- 1 to reps) {
+    var i = 0
+    while (i < reps) {
       val sb = new StringBuffer()
       val employee = AllRandomEmployees.rndEmployee(i)
       sb.append("<html>\n")
@@ -184,6 +200,8 @@ class TemplateBenchmark extends SimpleBenchmark {
       sb.append("  </ul>\n")
       sb.append("</html>\n")
       dummy = sb.toString
+
+      i += 1
     }
 
     dummy
@@ -192,7 +210,8 @@ class TemplateBenchmark extends SimpleBenchmark {
   def timeStringBuilder(reps: Int): String = {
     var dummy: String = null
 
-    for (i <- 1 to reps) {
+    var i = 0
+    while (i < reps) {
       val sb = new StringBuilder()
       val employee = AllRandomEmployees.rndEmployee(i)
       sb.append("<html>\n")
@@ -213,6 +232,8 @@ class TemplateBenchmark extends SimpleBenchmark {
       sb.append("  </ul>\n")
       sb.append("</html>\n")
       dummy = sb.toString
+
+      i += 1
     }
 
     dummy
@@ -221,27 +242,44 @@ class TemplateBenchmark extends SimpleBenchmark {
   def timeDumbStringConcatenation(reps: Int): String = {
     var dummy: String = null
 
-    for (i <- 1 to reps) {
+    var i = 0
+    while (i < reps) {
       var s = ""
       val employee = AllRandomEmployees.rndEmployee(i)
-      s = s + "<html>\n" + "<h1>All employees:</h1>\n" + "<h2>Name:" + employee.firstName + "</h2>\n"
-      s = s + "  <h2>Surname:" + employee.lastName + "</h2>\n"
-      s = s + "  <h2>Age:" +employee.age + "</h2>\n"
-      s = s + "  <h2>Position:" + employee.job.position + "</h2>\n"
-      s = s + "  <h2>Department:" + employee.job.department + "</h2>\n"
-      s = s + "  <h2>Years In Position:" + employee.job.yearsInPosition + "</h2>\n"
-      s = s + "  <h2>Salary:" + employee.job.salary + "</h2>\n"
-      s = s + "  <h2>Projects:</h2>\n"
-      s = s + "  <ul>\n"
-      employee.projects.asScala foreach { p =>
-        s = s + "    <li><h3>Code:" + p.code + ", Budget:" + p.budget + ", Keywords:\n"
-        p.keywords.asScala foreach { k => s = s + k + ", \n" }
-        s = s + "    </h3></li>\n"
-      }
-      s = s + "  </ul>\n"
-      s = s + "</html>\n"
+
+      s = s + "<html>\n" + "<h1>All employees:</h1>\n" + "<h2>Name:" + employee.firstName + "</h2>\n" +
+        "  <h2>Surname:" + employee.lastName + "</h2>\n" +
+        "  <h2>Age:" +employee.age + "</h2>\n" +
+        "  <h2>Position:" + employee.job.position + "</h2>\n" +
+        "  <h2>Department:" + employee.job.department + "</h2>\n" +
+        "  <h2>Years In Position:" + employee.job.yearsInPosition + "</h2>\n" +
+        "  <h2>Salary:" + employee.job.salary + "</h2>\n" +
+        "  <h2>Projects:</h2>\n" +
+        "  <ul>\n"
+
+        val numProjects = employee.projects.size
+        var project = 0
+        while (project < numProjects) {
+          val p = employee.projects.get(project)
+
+          s += "    <li><h3>Code:" + p.code + ", Budget:" + p.budget + ", Keywords:\n"
+
+          val numKeywords = p.keywords.size
+          var keyword = 0
+          while (keyword < numKeywords) {
+            val k = p.keywords.get(keyword)
+            s +=  k + ", \n"
+            keyword += 1
+          }
+
+          s += "    </h3></li>\n"
+          project += 1
+        }
+
+        s +=  "  </ul>\n" + "</html>\n"
 
       dummy = s
+      i += 1
     }
 
     dummy
